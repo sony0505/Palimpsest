@@ -1,32 +1,15 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <style>
-        .content-wrapper {
-            padding-left: {{ padding|default('2em') }};
-        }
-    </style>
+<div class="ps-5">
+<h1>Hello {{ username|capitalize }}</h1>  
 
-    <div class="content-wrapper">
-        <!-- 
-            | is Jinja2's filter operator
-            It can transform or format variables
-            Examples:
-            - capitalize: Capitalize the first letter of the string
-            - lower: Convert to lowercase
-            - upper: Convert to uppercase
-            - trim: Remove leading and trailing whitespace
-            - replace: Replace string
-            - default: Set default value
-        -->
-        <h1>Hello {{ username|capitalize }}</h1>  
-
-        {% for user in user_list %}
-            {% if user == username %}
-                <p>Hello {{ user|capitalize }}</p>
-            {%else%}
-                <p>{{ user|capitalize }}</p>
-            {% endif %}
-        {% endfor %}
-    </div>
+{% for user in user_list %}
+    {% if user == username %}
+        <p>Hello {{ user|capitalize }}</p>
+    {%else%}
+        <p>{{ user|capitalize }}</p>
+    {% endif %}
+{% endfor %}
+</div>
 {% endblock %}
