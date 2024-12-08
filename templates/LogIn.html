@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Log In</h1>
+{% if username %}
+    {% if username_error %}
+        <h2>{{ username_error }}</h2>
+    {% endif %}
+    {% if password_error %}
+        <h2>{{ password_error }}</h2>
+    {% else %}
+        <h2> Login Success </h2>
+        <h3>Hello, {{ username }}</h3>
+    {% endif %}
+{% else %}
+    <div class="shadow-sm p-3 mb-5 bg-body-tertiary rounded">
+        <form method="post">
+            {{ form.hidden_tag() }}
+            {{ form.username.label(class="form-label") }}
+            {{ form.username(size=32, class="form-control") }}
+            {{ form.password.label(class="form-label") }}
+            {{ form.password(size=32, class="form-control") }}
+            {{ form.email.label(class="form-label") }}
+            {{ form.email(size=50, class="form-control") }}
+            <br/>
+            {{ form.submit(class="btn btn-primary") }}  
+        </form>
+    </div>
+{% endif %}
+{% endblock %}

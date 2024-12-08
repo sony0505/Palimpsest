@@ -43,7 +43,13 @@ class UserForm(FlaskForm):
     user_id = None
     password = StringField('Password', validators=[DataRequired()])
     email = StringField('Email', validators=[DataRequired()])
-    submit = SubmitField('Save')
+    submit = SubmitField('SignUp')
+
+class LogInForm(FlaskForm):
+    username = StringField('Username', validators=[DataRequired()])
+    password = StringField('Password', validators=[DataRequired()])
+    email = StringField('Email', validators=[DataRequired()])
+    submit = SubmitField('Login')
 
 # Define a route for the root URL
 @app.route('/')
@@ -81,6 +87,22 @@ def SignUp():
         # Else print error message use flash, I will learn it later
     all_user = User.query.order_by(User.id).all() # Get all the users from the database and order them by id
     return render_template('SignUp.html', form=form, username=username, all_user=all_user)
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    username = None
+    form = LogInForm()
+    if form.validate_on_submit():
+        username = form.username.data
+        user = User.query.filter_by(username=username).first()
+        if user is not None:
+            if form.password.data == user.password:
+                return render_template('login.html', form=form, username=username)
+            else:
+                return render_template('login.html', form=form, username=username, password_error="Invalid password")
+        else:
+            return render_template('login.html', form=form, username=username, username_error="Invalid username")
+    return render_template('login.html', form=form, username=username)
 
 # create a custom error page
 # Invalid URL
