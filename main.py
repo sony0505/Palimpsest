@@ -83,14 +83,20 @@ def SignUp():
     form = UserForm()
     if form.validate_on_submit():
         username = form.username.data
-        user = User.query.filter_by(username=username).first() # Check if the username is already in the database. If it is, it will return the user object, if not, it will return None
-        if user is None: # If the username is not in the database, create a new user, else, it is already in the database, so don't add again
-            user = User(username=username, password=form.password.data, email=form.email.data)
-            print(user.username, user.password, user.email)
+        email = form.email.data
+        user = User.query.filter_by(username=username).first()
+        email_check = User.query.filter_by(email=email).first() # Check if the email is already in the database. Need to check here, otherwise add the same email to the database will get system error
+        
+        if user is None and email_check is None:
+            user = User(username=username, password=form.password.data, email=email)
             db.session.add(user)
             db.session.commit()
-        # Else print error message use flash, I will learn it later
-    all_user = User.query.order_by(User.id).all() # Get all the users from the database and order them by id
+        # email already exists error message
+        elif email_check:
+            all_user = User.query.order_by(User.id).all()
+            return render_template('SignUp.html', form=form, email_error="Email already exists", all_user=all_user)
+    
+    all_user = User.query.order_by(User.id).all()
     return render_template('SignUp.html', form=form, username=username, all_user=all_user)
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -100,9 +106,9 @@ def login():
     if form.validate_on_submit():
         username = form.username.data
         user = User.query.filter_by(username=username).first()
-        if user is not None:
-            if form.password.data == user.password:
-                return render_template('login.html', form=form, username=username)
+        if user is not None: # If the username is in the database
+            if form.password.data == user.password: # If the password is correct
+                return render_template('login.html', form=form, username=username) # Login success
             else:
                 return render_template('login.html', form=form, username=username, password_error="Invalid password")
         else:
@@ -114,14 +120,23 @@ def update(id):
     form = UpdateForm()
     user_to_update = User.query.get_or_404(id)
     if request.method == 'POST':
-        user_to_update.username = request.form['username']
-        user_to_update.password = request.form['password']
-        user_to_update.email = request.form['email']
+        email = request.form['email']
+        email_check = User.query.filter_by(email=email).first()
+        
+        # Check if the email is already in the database and it is not the same user
+        if email_check and email_check.id != user_to_update.id:
+            return render_template('update.html', form=form, user_to_update=user_to_update, 
+                                email_error="Email already exists")
+        
         try:
+            user_to_update.username = request.form['username']
+            user_to_update.password = request.form['password']
+            user_to_update.email = email
             db.session.commit()
             return redirect(url_for('SignUp'))
         except:
             return render_template('update.html', form=form, user_to_update=user_to_update)
+            
     return render_template('update.html', form=form, user_to_update=user_to_update)
 
 @app.route('/delete/<int:id>')

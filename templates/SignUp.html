@@ -6,6 +6,9 @@
 <h2>Hello, {{ username }}</h2>
 {% else %}
 <div class="shadow-sm p-3 mb-5 bg-body-tertiary rounded">
+{% if email_error %}
+    <div class="alert alert-danger">{{ email_error }}</div>
+{% endif %}
 <form method="post">
     {{ form.hidden_tag() }}
     {{ form.username.label(class="form-label") }}
