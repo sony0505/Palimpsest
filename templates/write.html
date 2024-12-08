@@ -4,14 +4,14 @@
 {% block content %}
 <h1>Write something</h1>
 {% if diary %}
-<p>{{ date }} - {{ diary }}</p>
+<h2>{{ date }} - {{ diary }}</h2>
 {% else %}
 <form method="post">
     {{ form.hidden_tag() }}
-    {{ form.diary.label }}
-    {{ form.diary(size=32) }}
+    {{ form.diary.label(class="form-label") }}
+    {{ form.diary(size=32, class="form-control") }}
     <br/>
-    {{ form.submit() }}
+    {{ form.submit(class="btn btn-primary") }}
 </form>
 {% endif %}
-{% endblock %}write.html
+{% endblock %}
