@@ -1,4 +1,4 @@
-from flask import Flask, render_template
+from flask import Flask, render_template,request, redirect, url_for, flash
 from datetime import datetime
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField
@@ -37,10 +37,14 @@ class DiaryForm(FlaskForm):
     # python wtf field
     diary = StringField('Write something', validators=[DataRequired()])
     submit = SubmitField('Save')
-   
+class UpdateForm(FlaskForm):# I don't know how to change the button text, so I create a new form for update. I don't know if it is a good way to do it, I will learn it later
+    username = StringField('Username', validators=[DataRequired()])
+    password = StringField('Password', validators=[DataRequired()])
+    email = StringField('Email', validators=[DataRequired()])
+    submit = SubmitField('Update')
+
 class UserForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired()])
-    user_id = None
     password = StringField('Password', validators=[DataRequired()])
     email = StringField('Email', validators=[DataRequired()])
     submit = SubmitField('SignUp')
@@ -82,6 +86,7 @@ def SignUp():
         user = User.query.filter_by(username=username).first() # Check if the username is already in the database. If it is, it will return the user object, if not, it will return None
         if user is None: # If the username is not in the database, create a new user, else, it is already in the database, so don't add again
             user = User(username=username, password=form.password.data, email=form.email.data)
+            print(user.username, user.password, user.email)
             db.session.add(user)
             db.session.commit()
         # Else print error message use flash, I will learn it later
@@ -104,6 +109,30 @@ def login():
             return render_template('login.html', form=form, username=username, username_error="Invalid username")
     return render_template('login.html', form=form, username=username)
 
+@app.route('/update/<int:id>', methods=['GET', 'POST'])
+def update(id):
+    form = UpdateForm()
+    user_to_update = User.query.get_or_404(id)
+    if request.method == 'POST':
+        user_to_update.username = request.form['username']
+        user_to_update.password = request.form['password']
+        user_to_update.email = request.form['email']
+        try:
+            db.session.commit()
+            return redirect(url_for('SignUp'))
+        except:
+            return render_template('update.html', form=form, user_to_update=user_to_update)
+    return render_template('update.html', form=form, user_to_update=user_to_update)
+
+@app.route('/delete/<int:id>')
+def delete(id):
+    user_to_delete = User.query.get_or_404(id)
+    try:
+        db.session.delete(user_to_delete)
+        db.session.commit()
+        return redirect(url_for('SignUp'))
+    except:
+        return redirect(url_for('SignUp'))
 # create a custom error page
 # Invalid URL
 @app.errorhandler(404)

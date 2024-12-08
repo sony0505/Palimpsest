@@ -9,11 +9,11 @@
 <form method="post">
     {{ form.hidden_tag() }}
     {{ form.username.label(class="form-label") }}
-    {{ form.username(size=32, class="form-control") }}
+    {{ form.username(size=32, class="form-control", value = NULL) }}
     {{ form.password.label(class="form-label") }}
-    {{ form.password(size=32, class="form-control") }}
+    {{ form.password(size=32, class="form-control", value = NULL) }}
     {{ form.email.label(class="form-label") }}
-    {{ form.email(size=32, class="form-control") }}
+    {{ form.email(size=32, class="form-control", value = NULL) }}
     <br/>
     {{ form.submit(class="btn btn-primary") }}
 </form>
@@ -33,8 +33,9 @@
     {% for user in all_user %}
         <tr>
             <td>{{ user.id }}</td>
-            <td>{{ user.username }}</td>
+            <td><a href="{{ url_for('update', id=user.id) }}">{{ user.username }}</a></td>
             <td>{{ user.email }}</td>
+            <td><a href="{{ url_for('delete', id=user.id) }}">Delete</a></td>
         </tr>
     {% endfor %}
     </tbody>

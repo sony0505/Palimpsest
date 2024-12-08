@@ -3,4 +3,9 @@ Flask-SQLAlchemy
 flask-login
 openai
 flask-wtf
+mysql-connector
+mysql-connector-python
+mysql-connector-python-rf
+pymysql
+cryptography
 
