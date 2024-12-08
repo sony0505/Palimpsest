@@ -3,17 +3,46 @@ from datetime import datetime
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField
 from wtforms.validators import DataRequired
-
+from flask_sqlalchemy import SQLAlchemy
+from datetime import datetime
 # Create a Flask app
 app = Flask(__name__)
 print("Flask app created")
 
 # Create a secret key
 app.config['SECRET_KEY'] = 'mysecretkey'
+# Create a database URI
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///diary.db'
+# Create a database
+db = SQLAlchemy(app)
 
+# Create a model
+class User(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(20), nullable=False, unique=True)
+    password = db.Column(db.String(20), nullable=False)
+    email = db.Column(db.String(120), nullable=False, unique=True)
+    def __repr__(self): # This is a method that returns a string representation of the object, it is used to print the readable version of the object to us when debugging
+        return '<UserName %r, UserEmail %r, UserID %r>' % (self.username, self.email, self.id)
+
+class Diary(db.Model):
+    id = db.Column(db.Integer, primary_key=True) # When using primary, it means that it is unique and generates automatically
+    diary = db.Column(db.String(1000), nullable=False)
+    date = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    def __repr__(self): # This is a method that returns a string representation of the object, it is used to print the readable version of the object to us when debugging
+        return '<DiaryId %r>' % self.id
 # Create a form
 class DiaryForm(FlaskForm):
+    # python wtf field
     diary = StringField('Write something', validators=[DataRequired()])
+    submit = SubmitField('Save')
+   
+class UserForm(FlaskForm):
+    username = StringField('Username', validators=[DataRequired()])
+    user_id = None
+    password = StringField('Password', validators=[DataRequired()])
+    email = StringField('Email', validators=[DataRequired()])
     submit = SubmitField('Save')
 
 # Define a route for the root URL
@@ -24,22 +53,36 @@ def index():
     return render_template('index.html')
 
 @app.route('/user/<username>')
-
 def user(username):
     #return "<h1>Hello {}</h1>".format(username)
-    user_list = ['Alice', 'Bob', 'Charlie']
+    user_list = ['Alice', 'Bob', 'Charlie'] # Get from database after database is created
     return render_template('user.html', username=username, user_list=user_list)
 
 @app.route('/write', methods=['GET', 'POST'])
 def write():
+    diary_content = None
     form = DiaryForm()
     if form.validate_on_submit():
-        diary = form.diary.data
-        return render_template('write.html', diary=diary, date=datetime.now().strftime('%Y-%m-%d'))
-    return render_template('write.html', form=form)
+        diary_content = form.diary.data
+        return render_template('write.html', diary=diary_content, date=datetime.now().strftime('%Y-%m-%d'))
+    return render_template('write.html', diary=diary_content,form=form) # Even if the user doesn't submit the form, the diary_content still need to be transferred to the write.html,because detect whether duary is empty to show different html
+
+@app.route('/SignUp', methods=['GET', 'POST'])
+def SignUp():
+    username = None
+    form = UserForm()
+    if form.validate_on_submit():
+        username = form.username.data
+        user = User.query.filter_by(username=username).first() # Check if the username is already in the database. If it is, it will return the user object, if not, it will return None
+        if user is None: # If the username is not in the database, create a new user, else, it is already in the database, so don't add again
+            user = User(username=username, password=form.password.data, email=form.email.data)
+            db.session.add(user)
+            db.session.commit()
+        # Else print error message use flash, I will learn it later
+    all_user = User.query.order_by(User.id).all() # Get all the users from the database and order them by id
+    return render_template('SignUp.html', form=form, username=username, all_user=all_user)
 
 # create a custom error page
-
 # Invalid URL
 @app.errorhandler(404)
 def page_not_found(e):
@@ -50,6 +93,14 @@ def page_not_found(e):
 def internal_server_error(e):
     return render_template('500.html'), 500
 
+# Initialize the database
+def init_db():
+    with app.app_context():# This is used to create a context for the database, make sure the database is created in the correct context(environment)
+        #db.drop_all()     # remove all tables
+        db.create_all()   # If there is no table, create a new one and add the models to it
+        # db operations can't be executed outside the context, have to be inside the context(make sure the database is created in the correct environment)
+
 # Run the app
 if __name__ == '__main__':
+    init_db()  # Initialize the database
     app.run(debug=True)
