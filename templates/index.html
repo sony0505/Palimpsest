@@ -1,5 +1,25 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h1>This is the index page</h1>
+<div class="container text-center mt-5">
+    <h1 class="display-4">Welcome to Our Diary Platform</h1>
+    <p class="lead">Share your thoughts, memories, and stories with the world.</p>
+    
+    {% if not session.get('logged_in') %}
+        <div class="mt-5">
+            <a href="{{ url_for('login') }}" class="btn btn-primary btn-lg mx-2">
+                <i class="bi bi-box-arrow-in-right"></i> Log In
+            </a>
+            <a href="{{ url_for('SignUp') }}" class="btn btn-outline-primary btn-lg mx-2">
+                <i class="bi bi-person-plus"></i> Sign Up
+            </a>
+        </div>
+    {% else %}
+        <div class="mt-5">
+            <a href="{{ url_for('write') }}" class="btn btn-primary btn-lg">
+                <i class="bi bi-pencil-square"></i> Start Writing
+            </a>
+        </div>
+    {% endif %}
+</div>
 {% endblock %}

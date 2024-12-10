@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Diary Warehouse</h1>
+
+{% if all_diary %}
+    <table class="table table-hover table-bordered table-striped">
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Diary</th>
+                <th>Date</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for diary in all_diary %}
+            <tr>
+                <td>{{ diary.title }}</td>
+                <td>{{ diary.diary }}</td>
+                <td>{{ diary.date.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% else %}
+    <div class="alert alert-info" role="alert">
+        No diaries found. <a href="{{ url_for('write') }}" class="alert-link">Write your first diary!</a>
+    </div>
+{% endif %}
+{% endblock %} 

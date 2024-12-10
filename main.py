@@ -80,8 +80,6 @@ def index():
 @app.route('/profile/<username>')
 @login_required
 def profile(username):
-    #return "<h1>Hello {}</h1>".format(username)
-    #user_list = ['Alice', 'Bob', 'Charlie'] # Get from database after database is created
     return render_template('profile.html')
 
 @app.route('/write', methods=['GET', 'POST'])
@@ -97,10 +95,9 @@ def write():
             diary = Diary(title=diary_title, diary=diary_content, user_id=session['user_id'])
             db.session.add(diary)
             db.session.commit()
-        all_diary = Diary.query.order_by(Diary.id).all()
-        return render_template('write.html', diary=diary_content, date=datetime.now().strftime('%Y-%m-%d'), all_diary=all_diary)
-    all_diary = Diary.query.order_by(Diary.id).all()
-    return render_template('write.html', diary=diary_content,form=form, all_diary=all_diary) # Even if the user doesn't submit the form, the diary_content still need to be transferred to the write.html,because detect whether duary is empty to show different html
+        all_diary = Diary.query.filter_by(user_id=session['user_id']).order_by(Diary.id).all()
+        return render_template('diary_warehouse.html', all_diary=all_diary)
+    return render_template('write.html', form=form)
 
 @app.route('/SignUp', methods=['GET', 'POST'])
 def SignUp():
@@ -151,17 +148,16 @@ def logout():
     session.pop('user_id', None)
     return redirect(url_for('index'))
 
-@app.route('/update/<int:id>', methods=['GET', 'POST'])
-def update(id):
+@app.route('/user_update/<int:id>', methods=['GET', 'POST'])
+def user_update(id):
     form = UpdateForm()
     user_to_update = User.query.get_or_404(id)
     if request.method == 'POST':
         email = request.form['email']
         email_check = User.query.filter_by(email=email).first()
         
-        # Check if the email is already in the database and it is not the same user
         if email_check and email_check.id != user_to_update.id:
-            return render_template('update.html', form=form, user_to_update=user_to_update, 
+            return render_template('user_update.html', form=form, user_to_update=user_to_update, 
                                 email_error="Email already exists")
         
         try:
@@ -171,9 +167,9 @@ def update(id):
             db.session.commit()
             return redirect(url_for('SignUp'))
         except:
-            return render_template('update.html', form=form, user_to_update=user_to_update)
+            return render_template('user_update.html', form=form, user_to_update=user_to_update)
             
-    return render_template('update.html', form=form, user_to_update=user_to_update)
+    return render_template('user_update.html', form=form, user_to_update=user_to_update)
 
 @app.route('/delete/<int:id>')
 def delete(id):
@@ -195,16 +191,21 @@ def page_not_found(e):
 def internal_server_error(e):
     return render_template('500.html'), 500
 
+@app.route('/diary_warehouse')
+@login_required
+def diary_warehouse():
+    # Get the diaries of the current user( Current user's diary only, later I will write a function to get the diary that the user has the authority to read base on the friend list. I will do it after I finish the friend relationship)
+    user_diaries = Diary.query.filter_by(user_id=session['user_id']).order_by(Diary.date.desc()).all()
+    return render_template('diary_warehouse.html', all_diary=user_diaries)
+
 # Initialize the database
 def init_db():
-    with app.app_context():# This is used to create a context for the database, make sure the database is created in the correct context(environment)
-        #db.drop_all()     # remove all tables
-        db.create_all()   # If there is no table, create a new one and add the models to it
-        # db operations can't be executed outside the context, have to be inside the context(make sure the database is created in the correct environment)
+    with app.app_context():
+        db.create_all()
 
 # Run the app
 if __name__ == '__main__':
-    init_db()  # Initialize the database
+    init_db()
     app.run(debug=True)
 
 
