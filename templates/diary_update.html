@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Update Diary</h1>
+<div class="shadow-sm p-3 mb-5 bg-body-tertiary rounded">
+<form method="post">
+    {{ form.hidden_tag() }}
+    {{ form.title.label(class="form-label") }}
+    {{ form.title(size=32, class="form-control", value=diary_to_update.title) }}
+    {{ form.diary.label(class="form-label") }}
+    {{ form.diary(size=32, class="form-control", value=diary_to_update.diary) }}
+    <br/>
+    {{ form.submit(class="btn btn-primary") }}
+</form>
+</div>
+{% endblock %}

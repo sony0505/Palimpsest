@@ -44,10 +44,15 @@ class DiaryForm(FlaskForm):
     diary = StringField('Write something', validators=[DataRequired()])
     #user_id = StringField('User ID(Debug only)')
     submit = SubmitField('Save')
-class UpdateForm(FlaskForm):# I don't know how to change the button text, so I create a new form for update. I don't know if it is a good way to do it, I will learn it later
+class UserUpdateForm(FlaskForm):# I don't know how to change the button text, so I create a new form for update. I don't know if it is a good way to do it, I will learn it later
     username = StringField('Username', validators=[DataRequired()])
     password = StringField('Password', validators=[DataRequired()])
     email = StringField('Email', validators=[DataRequired()])
+    submit = SubmitField('Update')
+
+class DiaryUpdateForm(FlaskForm):
+    title = StringField('Title', validators=[DataRequired()])
+    diary = StringField('Diary', validators=[DataRequired()])
     submit = SubmitField('Update')
 
 class UserForm(FlaskForm):
@@ -150,7 +155,7 @@ def logout():
 
 @app.route('/user_update/<int:id>', methods=['GET', 'POST'])
 def user_update(id):
-    form = UpdateForm()
+    form = UserUpdateForm()
     user_to_update = User.query.get_or_404(id)
     if request.method == 'POST':
         email = request.form['email']
@@ -165,11 +170,17 @@ def user_update(id):
             user_to_update.password = request.form['password']
             user_to_update.email = email
             db.session.commit()
-            return redirect(url_for('SignUp'))
+            return redirect(url_for('profile', username=session['username']))
         except:
             return render_template('user_update.html', form=form, user_to_update=user_to_update)
             
     return render_template('user_update.html', form=form, user_to_update=user_to_update)
+
+@app.route('/diary_update/<int:id>', methods=['GET', 'POST'])
+def diary_update(id):
+    form = DiaryUpdateForm()
+    diary_to_update = Diary.query.get_or_404(id)
+    return render_template('diary_warehouse.html', form=form, diary_to_update=diary_to_update)
 
 @app.route('/delete/<int:id>')
 def delete(id):
@@ -180,6 +191,14 @@ def delete(id):
         return redirect(url_for('SignUp'))
     except:
         return redirect(url_for('SignUp'))
+
+@app.route('/diary_warehouse')
+@login_required
+def diary_warehouse():
+    # Get the diaries of the current user( Current user's diary only, later I will write a function to get the diary that the user has the authority to read base on the friend list. I will do it after I finish the friend relationship)
+    user_diaries = Diary.query.filter_by(user_id=session['user_id']).order_by(Diary.date.desc()).all()
+    return render_template('diary_warehouse.html', all_diary=user_diaries)
+
 # create a custom error page
 # Invalid URL
 @app.errorhandler(404)
@@ -191,13 +210,6 @@ def page_not_found(e):
 def internal_server_error(e):
     return render_template('500.html'), 500
 
-@app.route('/diary_warehouse')
-@login_required
-def diary_warehouse():
-    # Get the diaries of the current user( Current user's diary only, later I will write a function to get the diary that the user has the authority to read base on the friend list. I will do it after I finish the friend relationship)
-    user_diaries = Diary.query.filter_by(user_id=session['user_id']).order_by(Diary.date.desc()).all()
-    return render_template('diary_warehouse.html', all_diary=user_diaries)
-
 # Initialize the database
 def init_db():
     with app.app_context():
@@ -207,8 +219,3 @@ def init_db():
 if __name__ == '__main__':
     init_db()
     app.run(debug=True)
-
-
-@app.route('/please_login')
-def please_login():
-    return render_template('PleaseLogIn.html')

@@ -1,44 +1,30 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h1>Write something</h1>
-{% if diary %}
-<h2>{{ date }} - {{ diary }}</h2>
-{% else %}
-<div class="shadow-sm p-3 mb-5 bg-body-tertiary rounded">
-<form method="post">
-    {{ form.hidden_tag() }}
-    {{ form.title.label(class="form-label") }}
-    {{ form.title(size=32, class="form-control") }}
-    {{ form.diary.label(class="form-label") }}
-    {{ form.diary(size=32, class="form-control") }}
-    <br/>
-    {{ form.submit(class="btn btn-primary") }}
-</form>
+<div class="container mt-5">
+    <h1 class="text-center mb-4" style="font-family: 'Playfair Display', serif; font-size: 2.5rem;">
+        Write Your Story
+    </h1>
+    
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="shadow-sm p-4 mb-5 bg-body-tertiary rounded">
+                <form method="post">
+                    {{ form.hidden_tag() }}
+                    <div class="mb-3">
+                        {{ form.title.label(class="form-label h5") }}
+                        {{ form.title(class="form-control", placeholder="Enter your title here") }}
+                    </div>
+                    <div class="mb-4">
+                        {{ form.diary.label(class="form-label h5") }}
+                        {{ form.diary(class="form-control", rows="10", style="resize: none;", placeholder="Share your thoughts...") }}
+                    </div>
+                    <div class="text-end">
+                        {{ form.submit(class="btn btn-primary px-4") }}
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 </div>
-<br/><br/><br/>
-<h2>My Diaries</h2>
-<table class="table table-hover table-bordered table-striped">
-    <thead>
-        <tr>
-            <th>ID</th>
-            <th>Title</th>
-            <th>Diary</th>
-            <th>Date</th>
-        </tr>
-    </thead>
-    <tbody>
-    {% for diary in all_diary %}
-        {% if diary.user_id == session['user_id'] %}
-        <tr>
-            <td>{{ diary.id }}</td>
-            <td>{{ diary.title }}</td>
-            <td>{{ diary.diary }}</td>
-            <td>{{ diary.date.strftime('%Y-%m-%d %H:%M:%S') }}</td>
-        </tr>
-        {% endif %}
-    {% endfor %}
-    </tbody>
-</table>
-{% endif %}
 {% endblock %}

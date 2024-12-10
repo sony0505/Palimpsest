@@ -1,30 +1,49 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h1>Diary Warehouse</h1>
+<div class="container mt-4">
+    <h1 class="text-center mb-4" style="font-family: 'Playfair Display', serif; font-size: 2.5rem;">
+        My Diaries
+    </h1>
 
-{% if all_diary %}
-    <table class="table table-hover table-bordered table-striped">
-        <thead>
-            <tr>
-                <th>Title</th>
-                <th>Diary</th>
-                <th>Date</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for diary in all_diary %}
-            <tr>
-                <td>{{ diary.title }}</td>
-                <td>{{ diary.diary }}</td>
-                <td>{{ diary.date.strftime('%Y-%m-%d %H:%M:%S') }}</td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
-{% else %}
-    <div class="alert alert-info" role="alert">
-        No diaries found. <a href="{{ url_for('write') }}" class="alert-link">Write your first diary!</a>
-    </div>
-{% endif %}
+    {% if all_diary %}
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th scope="col" style="width: 20%">Title</th>
+                        <th scope="col" style="width: 50%">Content</th>
+                        <th scope="col" style="width: 20%">Date</th>
+                        <th scope="col" style="width: 10%" class="text-center">Edit</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for diary in all_diary %}
+                    <tr>
+                        <td class="fw-semibold">{{ diary.title }}</td>
+                        <td>
+                            <div class="text-truncate" style="max-width: 500px;">
+                                {{ diary.diary }}
+                            </div>
+                        </td>
+                        <td class="text-muted">{{ diary.date.strftime('%Y-%m-%d %H:%M') }}</td>
+                        <td class="text-center">
+                            <a href="{{ url_for('diary_update', id=diary.id) }}" class="btn btn-outline-secondary btn-sm">
+                                <i class="bi bi-pencil"></i>
+                            </a>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="alert alert-info text-center" role="alert">
+            <p class="mb-0">No diaries found. Start your journey by writing your first diary!</p>
+            <a href="{{ url_for('write') }}" class="btn btn-primary mt-3">
+                <i class="bi bi-pencil-square me-2"></i>Write Now
+            </a>
+        </div>
+    {% endif %}
+</div>
 {% endblock %} 
