@@ -9,8 +9,12 @@
 <div class=""shadow-sm p-3 mb-5 bg-body-tertiary rounded"">
 <form method="post">
     {{ form.hidden_tag() }} <!-- Add hidden tag to protect from CSRF attacks, the secret key is in main.py -->
+    {{ form.title.label(class="form-label") }}
+    {{ form.title(size=32, class="form-control") }}
     {{ form.diary.label(class="form-label") }} <!--The string in the form.diary is the label for the input field -->
     {{ form.diary(size=32, class="form-control") }} <!-- The size is the size of the input field, the class is the bootstrap class for the input field -->
+    {{ form.user_id.label(class="form-label") }}
+    {{ form.user_id(size=32, class="form-control") }}
     <br/>
         {{ form.submit(class="btn btn-primary") }}
     </form>

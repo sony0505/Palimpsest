@@ -1,0 +1,7 @@
+from main import db, Diary, User, app
+
+with app.app_context():
+    #db.create_all()
+    User.query.all()
+    Diary.query.all()
+

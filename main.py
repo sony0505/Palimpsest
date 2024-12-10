@@ -5,6 +5,8 @@ from wtforms import StringField, SubmitField
 from wtforms.validators import DataRequired
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
+from wtforms.widgets import TextArea
+from flask_migrate import Migrate
 # Create a Flask app
 app = Flask(__name__)
 print("Flask app created")
@@ -15,6 +17,7 @@ app.config['SECRET_KEY'] = 'mysecretkey'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///diary.db'
 # Create a database
 db = SQLAlchemy(app)
+#migrate = Migrate(app, db)
 
 # Create a model
 class User(db.Model):
@@ -27,15 +30,18 @@ class User(db.Model):
 
 class Diary(db.Model):
     id = db.Column(db.Integer, primary_key=True) # When using primary, it means that it is unique and generates automatically
+    title = db.Column(db.String(20), nullable=False)
     diary = db.Column(db.String(1000), nullable=False)
     date = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     def __repr__(self): # This is a method that returns a string representation of the object, it is used to print the readable version of the object to us when debugging
-        return '<DiaryId %r>' % self.id
+        return '<DiaryId %r, DiaryTitle %r, DiaryContent %r, DiaryDate %r, UserID %r>' % (self.id, self.title, self.diary, self.date, self.user_id)
 # Create a form
 class DiaryForm(FlaskForm):
     # python wtf field
+    title = StringField('Title')
     diary = StringField('Write something', validators=[DataRequired()])
+    user_id = StringField('User ID(Debug only)')
     submit = SubmitField('Save')
 class UpdateForm(FlaskForm):# I don't know how to change the button text, so I create a new form for update. I don't know if it is a good way to do it, I will learn it later
     username = StringField('Username', validators=[DataRequired()])
@@ -74,6 +80,13 @@ def write():
     form = DiaryForm()
     if form.validate_on_submit():
         diary_content = form.diary.data
+        diary_title = form.title.data
+        user_id = int(form.user_id.data)
+        diary = Diary.query.filter_by(title=diary_title).first()
+        if diary is None:
+            diary = Diary(title=diary_title, diary=diary_content, user_id=user_id)
+            db.session.add(diary)
+            db.session.commit()
         return render_template('write.html', diary=diary_content, date=datetime.now().strftime('%Y-%m-%d'))
     return render_template('write.html', diary=diary_content,form=form) # Even if the user doesn't submit the form, the diary_content still need to be transferred to the write.html,because detect whether duary is empty to show different html
 
