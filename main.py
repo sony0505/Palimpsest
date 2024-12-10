@@ -77,12 +77,12 @@ def index():
     #return "<h1>Hello, World!</h1>"
     return render_template('index.html')
 
-@app.route('/user/<username>')
+@app.route('/profile/<username>')
 @login_required
-def user(username):
+def profile(username):
     #return "<h1>Hello {}</h1>".format(username)
     #user_list = ['Alice', 'Bob', 'Charlie'] # Get from database after database is created
-    return render_template('user.html')
+    return render_template('profile.html')
 
 @app.route('/write', methods=['GET', 'POST'])
 @login_required

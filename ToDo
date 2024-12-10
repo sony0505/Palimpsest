@@ -1,0 +1,55 @@
+# Project ToDo List
+
+## Feature Development
+- [x] Basic User Authentication
+  - [x] Registration
+  - [x] Login
+  - [x] Logout
+  - [x] Access Control
+
+- [x] Diary System
+  - [x] Create Diary
+  - [x] Display Personal Diary List
+  - [x] Diary Timestamp
+  - [ ] Edit Diary
+  - [ ] Delete Diary
+
+- [ ] User Management
+  - [x] Display User Info
+  - [x] Update User Info
+  - [ ] Upload User Avatar
+  - [ ] Change Password
+
+## UI/UX Improvements
+- [x] Bootstrap Implementation
+- [x] Responsive Navbar
+- [ ] Diary Editor Enhancement
+- [ ] Error Message Styling
+
+## Security Enhancements
+- [ ] Password Encryption
+- [ ] CSRF Protection
+- [ ] XSS Prevention
+- [ ] Input Validation
+
+## Database Optimization
+- [x] SQLAlchemy ORM Implementation
+- [ ] Database Migration System
+- [ ] Backup Mechanism
+
+## Future Features
+- [ ] Diary Categories
+- [ ] Diary Search
+- [ ] Diary Sharing
+- [ ] Comment System
+- [ ] Tag System
+
+## Bug Fixes
+- [x] Email Duplication Issue
+- [x] Unauthorized Access Issue
+- [ ] Diary Display Format Issue
+
+## Documentation
+- [ ] Project Description
+- [ ] API Documentation
+- [ ] Deployment Guide

@@ -8,7 +8,7 @@
                         <a class="nav-link" href="{{ url_for('write') }}">Write</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('user', username=session.get('username')) }}">Profile</a>
+                        <a class="nav-link" href="{{ url_for('profile', username=session.get('username')) }}">Profile</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="{{ url_for('logout') }}">Logout</a>

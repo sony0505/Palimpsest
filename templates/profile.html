@@ -10,11 +10,11 @@
             <table class="table table-hover table-bordered table-striped" style="width: 50%;">
                 <tr>
                     <th style="width: 50%;">Username:</th>
-                    <td>{{ session['username'] }}</td>
+                    <td><a href="{{ url_for('update', id=session['user_id']) }}">{{ session['username'] }}</a></td>
                 </tr>
                 <tr>
                     <th style="width: 50%;">Email:</th>
-                    <td style="width: 50%;">{{ session['email'] }}</td>
+                    <td style="width: 50%;"> <a href="{{ url_for('update', id=session['user_id']) }}">{{ session['email'] }}</a></td>
                 </tr>
             </table>
         </div>
