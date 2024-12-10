@@ -1,4 +1,4 @@
-from flask import Flask, render_template,request, redirect, url_for, flash
+from flask import Flask, render_template,request, redirect, url_for, flash, session
 from datetime import datetime
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField
@@ -7,6 +7,7 @@ from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 from wtforms.widgets import TextArea
 from flask_migrate import Migrate
+from functools import wraps
 # Create a Flask app
 app = Flask(__name__)
 print("Flask app created")
@@ -61,6 +62,14 @@ class LogInForm(FlaskForm):
     email = StringField('Email', validators=[DataRequired()])
     submit = SubmitField('Login')
 
+def login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if not session.get('logged_in'):
+            return redirect(url_for('please_login'))
+        return f(*args, **kwargs)
+    return decorated_function
+
 # Define a route for the root URL
 @app.route('/')
 # Define a function to handle requests to the root URL
@@ -69,12 +78,14 @@ def index():
     return render_template('index.html')
 
 @app.route('/user/<username>')
+@login_required
 def user(username):
     #return "<h1>Hello {}</h1>".format(username)
     user_list = ['Alice', 'Bob', 'Charlie'] # Get from database after database is created
     return render_template('user.html', username=username, user_list=user_list)
 
 @app.route('/write', methods=['GET', 'POST'])
+@login_required
 def write():
     diary_content = None
     form = DiaryForm()
@@ -121,14 +132,24 @@ def login():
     if form.validate_on_submit():
         username = form.username.data
         user = User.query.filter_by(username=username).first()
-        if user is not None: # If the username is in the database
-            if form.password.data == user.password: # If the password is correct
-                return render_template('login.html', form=form, username=username) # Login success
+        if user is not None:
+            if form.password.data == user.password:
+                session['logged_in'] = True
+                session['username'] = username
+                session['user_id'] = user.id
+                return redirect(url_for('index'))
             else:
-                return render_template('login.html', form=form, username=username, password_error="Invalid password")
+                return render_template('login.html', form=form, password_error="Invalid password")
         else:
-            return render_template('login.html', form=form, username=username, username_error="Invalid username")
-    return render_template('login.html', form=form, username=username)
+            return render_template('login.html', form=form, username_error="Invalid username")
+    return render_template('login.html', form=form)
+
+@app.route('/logout')
+def logout():
+    session.pop('logged_in', None)
+    session.pop('username', None)
+    session.pop('user_id', None)
+    return redirect(url_for('index'))
 
 @app.route('/update/<int:id>', methods=['GET', 'POST'])
 def update(id):
@@ -185,3 +206,8 @@ def init_db():
 if __name__ == '__main__':
     init_db()  # Initialize the database
     app.run(debug=True)
+
+
+@app.route('/please_login')
+def please_login():
+    return render_template('PleaseLogIn.html')
