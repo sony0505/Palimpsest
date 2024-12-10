@@ -87,8 +87,10 @@ def write():
             diary = Diary(title=diary_title, diary=diary_content, user_id=user_id)
             db.session.add(diary)
             db.session.commit()
-        return render_template('write.html', diary=diary_content, date=datetime.now().strftime('%Y-%m-%d'))
-    return render_template('write.html', diary=diary_content,form=form) # Even if the user doesn't submit the form, the diary_content still need to be transferred to the write.html,because detect whether duary is empty to show different html
+        all_diary = Diary.query.order_by(Diary.id).all()
+        return render_template('write.html', diary=diary_content, date=datetime.now().strftime('%Y-%m-%d'), all_diary=all_diary)
+    all_diary = Diary.query.order_by(Diary.id).all()
+    return render_template('write.html', diary=diary_content,form=form, all_diary=all_diary) # Even if the user doesn't submit the form, the diary_content still need to be transferred to the write.html,because detect whether duary is empty to show different html
 
 @app.route('/SignUp', methods=['GET', 'POST'])
 def SignUp():

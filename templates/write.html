@@ -19,5 +19,29 @@
         {{ form.submit(class="btn btn-primary") }}
     </form>
 </div>
+<br/><br/><br/>
+<h2>All Diaries</h2>
+<table class="table table-hover table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Title</th>
+            <th>Diary</th>
+            <th>Date</th>
+            <th>User ID</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for diary in all_diary %}
+        <tr>
+            <td>{{ diary.id }}</td>
+            <td>{{ diary.title }}</td>
+            <td>{{ diary.diary }}</td>
+            <td>{{ diary.date }}</td>
+            <td>{{ diary.user_id }}</td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
 {% endif %}
 {% endblock %}
