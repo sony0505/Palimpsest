@@ -1,15 +1,23 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="ps-5">
-<h1>Hello {{ username|capitalize }}</h1>  
-
-{% for user in user_list %}
-    {% if user == username %}
-        <p>Hello {{ user|capitalize }}</p>
-    {%else%}
-        <p>{{ user|capitalize }}</p>
-    {% endif %}
-{% endfor %}
+<div>
+    <h1>Hello {{ session['username']|capitalize }}</h1>
+    <br/><br/>
+    <div>
+        <div>
+            <h5>User Information</h5>
+            <table class="table table-hover table-bordered table-striped" style="width: 50%;">
+                <tr>
+                    <th style="width: 50%;">Username:</th>
+                    <td>{{ session['username'] }}</td>
+                </tr>
+                <tr>
+                    <th style="width: 50%;">Email:</th>
+                    <td style="width: 50%;">{{ session['email'] }}</td>
+                </tr>
+            </table>
+        </div>
+    </div>
 </div>
 {% endblock %}

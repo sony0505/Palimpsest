@@ -1,4 +1,3 @@
-
 {% extends "base.html" %}
 
 {% block content %}
@@ -6,21 +5,19 @@
 {% if diary %}
 <h2>{{ date }} - {{ diary }}</h2>
 {% else %}
-<div class=""shadow-sm p-3 mb-5 bg-body-tertiary rounded"">
+<div class="shadow-sm p-3 mb-5 bg-body-tertiary rounded">
 <form method="post">
-    {{ form.hidden_tag() }} <!-- Add hidden tag to protect from CSRF attacks, the secret key is in main.py -->
+    {{ form.hidden_tag() }}
     {{ form.title.label(class="form-label") }}
     {{ form.title(size=32, class="form-control") }}
-    {{ form.diary.label(class="form-label") }} <!--The string in the form.diary is the label for the input field -->
-    {{ form.diary(size=32, class="form-control") }} <!-- The size is the size of the input field, the class is the bootstrap class for the input field -->
-    {{ form.user_id.label(class="form-label") }}
-    {{ form.user_id(size=32, class="form-control") }}
+    {{ form.diary.label(class="form-label") }}
+    {{ form.diary(size=32, class="form-control") }}
     <br/>
-        {{ form.submit(class="btn btn-primary") }}
-    </form>
+    {{ form.submit(class="btn btn-primary") }}
+</form>
 </div>
 <br/><br/><br/>
-<h2>All Diaries</h2>
+<h2>My Diaries</h2>
 <table class="table table-hover table-bordered table-striped">
     <thead>
         <tr>
@@ -28,18 +25,18 @@
             <th>Title</th>
             <th>Diary</th>
             <th>Date</th>
-            <th>User ID</th>
         </tr>
     </thead>
     <tbody>
     {% for diary in all_diary %}
+        {% if diary.user_id == session['user_id'] %}
         <tr>
             <td>{{ diary.id }}</td>
             <td>{{ diary.title }}</td>
             <td>{{ diary.diary }}</td>
-            <td>{{ diary.date }}</td>
-            <td>{{ diary.user_id }}</td>
+            <td>{{ diary.date.strftime('%Y-%m-%d %H:%M:%S') }}</td>
         </tr>
+        {% endif %}
     {% endfor %}
     </tbody>
 </table>

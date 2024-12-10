@@ -42,7 +42,7 @@ class DiaryForm(FlaskForm):
     # python wtf field
     title = StringField('Title')
     diary = StringField('Write something', validators=[DataRequired()])
-    user_id = StringField('User ID(Debug only)')
+    #user_id = StringField('User ID(Debug only)')
     submit = SubmitField('Save')
 class UpdateForm(FlaskForm):# I don't know how to change the button text, so I create a new form for update. I don't know if it is a good way to do it, I will learn it later
     username = StringField('Username', validators=[DataRequired()])
@@ -81,8 +81,8 @@ def index():
 @login_required
 def user(username):
     #return "<h1>Hello {}</h1>".format(username)
-    user_list = ['Alice', 'Bob', 'Charlie'] # Get from database after database is created
-    return render_template('user.html', username=username, user_list=user_list)
+    #user_list = ['Alice', 'Bob', 'Charlie'] # Get from database after database is created
+    return render_template('user.html')
 
 @app.route('/write', methods=['GET', 'POST'])
 @login_required
@@ -92,10 +92,9 @@ def write():
     if form.validate_on_submit():
         diary_content = form.diary.data
         diary_title = form.title.data
-        user_id = int(form.user_id.data)
         diary = Diary.query.filter_by(title=diary_title).first()
         if diary is None:
-            diary = Diary(title=diary_title, diary=diary_content, user_id=user_id)
+            diary = Diary(title=diary_title, diary=diary_content, user_id=session['user_id'])
             db.session.add(diary)
             db.session.commit()
         all_diary = Diary.query.order_by(Diary.id).all()
@@ -137,6 +136,7 @@ def login():
                 session['logged_in'] = True
                 session['username'] = username
                 session['user_id'] = user.id
+                session['email'] = user.email
                 return redirect(url_for('index'))
             else:
                 return render_template('login.html', form=form, password_error="Invalid password")
